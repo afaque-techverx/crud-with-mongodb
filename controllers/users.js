@@ -27,32 +27,22 @@ export const getUser = async (req, res) => {
 
 export const readUser = async (req, res) => {
   const user = req.params;
-  try {
-    await User.find({ name: user.name });
-  } catch (error) {
-    console.log(error.message);
-  }
+
+  const foundUser = await User.find({ _id: user._id });
 
   res.send(foundUser);
 };
 export const deleteUser = async (req, res) => {
   const user = req.params;
-  try {
-    await User.deleteOne({ name: user.name });
-  } catch (error) {
-    console.log(error.message);
-  }
-  res.send(`User with this id ${user.name} is deleted`);
+  await User.deleteOne({ _id: user._id });
+
+  res.send(`User with this id ${user._id} is deleted`);
 };
 
 export const updateUser = async (req, res) => {
   const userName = req.params;
   const toUpdate = req.body;
-  try {
-    await User.updateOne(userName, toUpdate);
-  } catch (error) {
-    console.log(error.message);
-  }
+  await User.updateOne(userName, toUpdate);
 
-  res.send(`Id } has been updated `);
+  res.send(`This Id ${userName._id}  has been updated `);
 };
