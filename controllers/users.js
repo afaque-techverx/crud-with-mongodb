@@ -1,36 +1,58 @@
-import { v4 as uuidv4 } from "uuid";
+import mongoose from "mongoose";
+import User from "../model/userSchema.js";
+mongoose.connect("mongodb://localhost/testdb");
 
-let users = [];
-
-export const createUser = (req, res) => {
-  const user = req.body;
-  users.push({ id: uuidv4(), ...user });
+export const createUser = async (req, res) => {
+  const getUsers = req.body;
+  try {
+    const addedUser = await User.create({
+      name: getUsers.name,
+      age: getUsers.age,
+      hobbies: getUsers.hobbies,
+      email: getUsers.email,
+      address: getUsers.address,
+    });
+    await addedUser.save();
+    console.log(addedUser);
+  } catch (error) {
+    console.log(error.message);
+  }
   res.send(
-    `New user ${user.firstName} ${user.lastName} of age ${user.age} added to database`
+    `New user ${getUsers.name} of age ${getUsers.age} is added to database`
   );
 };
-export const readUser = (req, res) => {
-  const { id } = req.params;
-  const foundUser = users.find((user) => user.id === id);
+export const getUser = async (req, res) => {
+  res.send(await User.find({}));
+};
+
+export const readUser = async (req, res) => {
+  const user = req.params;
+  try {
+    await User.find({ name: user.name });
+  } catch (error) {
+    console.log(error.message);
+  }
+
   res.send(foundUser);
 };
-export const deleteUser = (req, res) => {
-  const { id } = req.params;
-  users = users.filter((user) => user.id !== id);
-  res.send(`User with this id ${id} is deleted`);
+export const deleteUser = async (req, res) => {
+  const user = req.params;
+  try {
+    await User.deleteOne({ name: user.name });
+  } catch (error) {
+    console.log(error.message);
+  }
+  res.send(`User with this id ${user.name} is deleted`);
 };
 
-export const getUser = (req, res) => {
-  res.send(users);
-};
-export const updateUser = (req, res) => {
-  const { id } = req.params;
-  const { firstName, lastName, age } = req.body;
-  const user = users.find((user) => user.id === id);
+export const updateUser = async (req, res) => {
+  const userName = req.params;
+  const toUpdate = req.body;
+  try {
+    await User.updateOne(userName, toUpdate);
+  } catch (error) {
+    console.log(error.message);
+  }
 
-  if (firstName) user.firstName = firstName;
-  if (lastName) user.lastName = lastName;
-  if (age) user.age = age;
-
-  res.send(`Id ${id} has been updated `);
+  res.send(`Id } has been updated `);
 };
